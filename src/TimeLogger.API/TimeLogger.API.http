@@ -1,0 +1,6 @@
+@TimeLogger.API_HostAddress = http://localhost:5014
+
+GET {{TimeLogger.API_HostAddress}}/customers/
+Accept: application/json
+
+###
