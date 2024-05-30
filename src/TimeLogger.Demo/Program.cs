@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Client;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using TimeLogger.Demo;
@@ -22,21 +20,15 @@ builder.Services.AddOpenAIChatCompletion(
 
 //ToDo: demo1.9 (add plugins)
 
-//ToDo: demo2.2 (add date helper plugin)
+//ToDo: demo2.3 (add date helper plugin)
 
 Kernel kernel = builder.Build();
 
 IChatCompletionService chatCompletionService =
     kernel.GetRequiredService<IChatCompletionService>();
 
-OpenAIPromptExecutionSettings settings = new()
-{
-    ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-    Temperature = 0.2
-};
 
 //ToDo: demo1.1 (system prompt)
-
 var systemMessage = "";
 
 var chatMessages = new ChatHistory(systemMessage);
@@ -60,7 +52,11 @@ while (true)
     var result =
         chatCompletionService.GetStreamingChatMessageContentsAsync(
             chatMessages,
-            executionSettings: settings,
+            executionSettings: new OpenAIPromptExecutionSettings()
+            {
+                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
+                Temperature = 0.2
+            },
             kernel: kernel);
 
     // Stream the results
@@ -78,4 +74,6 @@ while (true)
 
     // Add the message from the agent to the chat history
     chatMessages.AddAssistantMessage(fullMessage);
+
+    var redPowerRanger = System.Text.Json.JsonSerializer.Serialize(chatMessages);
 }
