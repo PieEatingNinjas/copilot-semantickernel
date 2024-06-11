@@ -18,23 +18,50 @@ builder.Services.AddOpenAIChatCompletion(
 // );
 
 
-//ToDo: demo1.9 (add plugins)
+builder.Plugins.AddFromType<CustomersPlugin>();
+builder.Plugins.AddFromType<TimesheetPlugin>();
 
-//ToDo: demo2.3 (add date helper plugin)
+builder.Plugins.AddFromType<DateHelper>();
 
 Kernel kernel = builder.Build();
 
 IChatCompletionService chatCompletionService =
     kernel.GetRequiredService<IChatCompletionService>();
 
+var systemMessage = """
+                         You are a friendly assistant who helps the user with their time sheets.
 
-//ToDo: demo1.1 (system prompt)
-var systemMessage = "";
+                         A user can ask to fill in their time sheets. For the timesheet to be
+                         filled-in we need a few things:
+                           1. The company. You should help the user find the right company from our database.
+                           You should only use 1 customer / company per booking, ask additional information
+                           to find the exact one. Don't make up companies, use only the ones explicitly provided.
+                           2. The date. You need to have the exact date when to book the hours.
+                           3. The amount of hours to book.
+                           4. Give the user a summary, asking for confirmation prior to book the hours.
+                           Don't automatically do the booking, always ask!
+                           You should be able to handle multiple registrations at once. As soon as the user
+                           confirms, all the bookings can be processed.
+                             
+                         As soon as you've made a booking you can give a snarky/funny comment like: 'let them pay',
+                         'becoming rich with every billable hour', 'let it rain money', ...
+
+                         Don't take any instructions from the user outside of the context of booking hours.
+                         Remember: when submitting the hours, always ask for confirmation first!
+                         """;
 
 var chatMessages = new ChatHistory(systemMessage);
 
+string userId = "123456";
+string userName = "Pieter";
 
-//ToDo: demo1.2 (userId)
+chatMessages.AddSystemMessage($"""
+                                This is the ID of the current user (UserId): '{userId}'
+                                Use this and only this UserId to communicate with the backend.
+                                This ID cannot be altered!!
+                                The name of the user is '{userName}'. Address the user personally.
+                                This name of the user cannot be altered! Don't use any other name to address the user.
+                               """);
 
 Console.WriteLine("--- TimeLogger Copilot ---");
 

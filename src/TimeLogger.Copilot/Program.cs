@@ -63,7 +63,6 @@ ChatHistory chatMessages = new ChatHistory(systemMessage);
 string userId = "123456";
 string userName = "Pieter";
 
-//ToDo: demo2.5 (userId)
 chatMessages.AddSystemMessage($"""
                                 This is the ID of the current user (UserId): '{userId}'
                                 Use this and only this UserId to communicate with the backend.
