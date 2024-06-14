@@ -17,6 +17,7 @@ while (true)
 
     var question = Console.ReadLine();
 
+    Console.Write("Assistant > ");
     await foreach (var msg in client.GetFromJsonAsAsyncEnumerable<string>(
                        $"/chat?sessionId={session}&question={question}"))
     {
